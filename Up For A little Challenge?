@@ -1,0 +1,138 @@
+# 🚩 Up For A Little Challenge? - Forensics - CTFlearn
+[+] By Osama Zeidan
+
+**Difficulty:** Medium  
+**Points:** 60  
+**Category:** Forensics  
+
+---
+
+## 🔍 Challenge Description
+
+> [https://mega.nz/#!LoABFK5K!0sEKbsU3sBUG8zWxpBfD1bQx_JY_MuYEWQvLrFIqWZ0](https://mega.nz/#!LoABFK5K!0sEKbsU3sBUG8zWxpBfD1bQx_JY_MuYEWQvLrFIqWZ0)  
+>  
+> *You know what to do...*
+
+---
+
+## 📂 Files Provided
+
+- An image file (from the MEGA link)
+
+---
+
+## 🧠 Approach
+
+### 1. Understanding the Challenge
+The description is vague but hints at digging into a provided image. This suggests steganography or hidden data. Let's start with basic forensic tools.
+
+### 2. Initial Observations
+After downloading the image, it looks ordinary at first glance. However, running `strings` reveals hidden data—including a secondary URL to download a compressed archive. This pattern continues with nested archives and misleading filenames, requiring careful inspection and tool use.
+
+### 3. Tools Used
+
+- `strings`
+- `binwalk`
+- `file`
+- `unzip`
+- `ls`, `ls -a`
+- `eog` (Eye of GNOME image viewer)
+
+---
+
+## 🧪 Exploitation Process
+
+### Step-by-Step Breakdown
+
+```bash
+# Step 1: Download and inspect the image
+strings image.jpg
+```
+
+This reveals a hidden URL to a secondary archive. Download it.
+
+```bash
+# Step 2: Extract the downloaded compressed archive
+unzip archive.zip
+```
+
+You’ll see two folders: `__MACOSX` and `Did I Forget It Again?`. Navigate to the latter.
+
+```bash
+cd 'Did I Forget It Again?'
+ls -a
+```
+
+You'll notice a hidden file: `.Processing.cerb4`
+
+```bash
+file .Processing.cerb4
+```
+
+Output:
+```
+.Processing.cerb4: Zip archive data, at least v2.0 to extract, compression method=deflate
+```
+
+Unzip it:
+
+```bash
+unzip .Processing.cerb4
+```
+
+Inside, you’ll find `0.zip`, which is password protected.
+
+### Finding the Password
+
+Return to the original image and run `strings` again, carefully analyzing output. Look for any patterns or key-like strings.
+
+You’ll find a line:
+```
+Mp real_unlock_key: Nothing Is As It SeemsU
+```
+
+Remove the trailing `'U'`. This gives the password:
+
+```
+Nothing Is As It Seems
+```
+
+Now unzip the final archive:
+
+```bash
+unzip -P "Nothing Is As It Seems" 0.zip
+```
+
+This gives you a final image.
+
+### Extracting the Flag
+
+Open the final image using `eog` (or any image viewer). Carefully inspect the corners. You’ll spot the flag in small print at the bottom-right corner.
+
+---
+
+## 🏁 Flag
+
+```
+flag{hack_......}
+Hack Harder to Get the Full Flag!....
+```
+
+---
+
+## 💬 Notes / What I Learned
+
+- Always check image files with `strings`, even if they look normal.
+- Hidden files can be disguised with misleading names and extensions.
+- Nesting zip files is a common CTF trick to test persistence.
+- Passwords may be subtly hidden within non-obvious text—attention to detail is key.
+
+---
+
+## 🛠 Tools & Resources
+
+- [binwalk]
+- [strings]
+- [eog]
+
+[+] By Osama Zeidan
