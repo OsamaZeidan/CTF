@@ -1,0 +1,94 @@
+# 🚩 Exclusive Santa - Forensics - CTFlearn
+[+] By Osama Zeidan
+
+**Difficulty:** Medium  
+**Points:** 60
+**Category:** Forensics  
+
+---
+
+## 🔍 Challenge Description
+
+> A suspicious image has been intercepted. Rumor has it, Santa's been working on something secret. Can you uncover what it is?  
+>  
+> You are provided with a `.rar` archive which contains two PNG images. Investigate and uncover the hidden message.
+
+---
+
+## 📂 Files Provided
+
+- `Exclusive_Santa.rar` → extracted to:
+  - `1.png`
+  - `3.png`
+
+---
+
+## 🧠 Approach
+
+### 1. Understanding the Challenge
+The `.rar` file gave us `1.png` and `3.png`, which naturally implies the presence of a missing `2.png`. That hint suggests something is hidden between the two provided images—possibly in a steganographic form.
+
+---
+
+## 🧪 Exploitation Process
+
+### 🔸 Step 1: Initial Inspection
+After extracting the `.rar`, we got:
+- `1.png` and `3.png`
+
+Logically, the absence of `2.png` points to a hidden image.
+
+### 🔸 Step 2: Attempted File Extraction via Binwalk
+We tried using `binwalk` to extract any embedded data:
+
+```bash
+binwalk -e 1.png
+binwalk -e 3.png
+```
+
+Although several files were extracted, **no usable image** (such as a likely `2.png`) was recovered.
+
+### 🔸 Step 3: File Recovery with Foremost
+Since `binwalk` didn't work, we turned to `foremost`, which is better for file carving:
+
+```bash
+foremost -i 3.png
+```
+
+This successfully extracted a **new image** that visually resembles `1.png`. It appeared to be the missing image — our likely `2.png`.
+
+### 🔸 Step 4: XORing with StegSolve
+To extract the flag:
+
+1. Open `1.png` in `stegsolve.jar`
+2. Go to `Image > Open Second Image` and load the image extracted by `foremost`
+3. Navigate to the **XOR operation**
+4. A hidden message appears when XORing the two images
+
+---
+
+## 🏁 Flag
+
+```
+CTFlearn{Santa_......}
+Hack Harde to Get the Full Flag!....
+```
+
+---
+
+## 💬 Notes / What I Learned
+
+- Logical file naming can point to hidden clues—`1.png` and `3.png` suggest a `2.png`.
+- When `binwalk` fails, `foremost` often succeeds in carving real hidden files.
+- XORing near-identical images is a clever way to expose hidden content.
+- `StegSolve` is incredibly useful for visual XOR and steganographic analysis.
+
+---
+
+## 🛠 Tools & Resources
+
+- [binwalk]
+- [foremost]
+- [stegsolve.jar]
+
+[+] By Osama Zeidan
