@@ -1,0 +1,116 @@
+# 🚩 XOR Flag Recovery – Crypto – CTFlearn  
+[+] By Osama Zeidan  
+
+**Difficulty:** Hard
+**Points:** 100
+**Category:** Cryptography  
+
+---
+
+## 🔍 Challenge Description
+
+> Here: `\t\x1b\x11\x00\x16\x0b\x1d\x19\x17\x0b\x05\x1d(\x05\x005\x1b\x1f\t,\r\x00\x18\x1c\x0e`  
+>  
+> I think the flag started with: `ctflearn{`  
+
+The challenge gives us a suspicious string of bytes in escape-character format and a hint that the flag starts with a standard CTF flag prefix `ctflearn{`.
+
+---
+
+## 📂 Files Provided
+
+No file was provided, but the following **cipher bytes** were embedded directly in the challenge:
+
+```
+\t\x1b\x11\x00\x16\x0b\x1d\x19\x17\x0b\x05\x1d(\x05\x005\x1b\x1f\t,\r\x00\x18\x1c\x0e
+```
+
+Which corresponds to a **byte array** like:
+```python
+cipher = b"\t\x1b\x11\x00\x16\x0b\x1d\x19\x17\x0b\x05\x1d(\x05\x005\x1b\x1f\t,\r\x00\x18\x1c\x0e"
+```
+
+---
+
+## 🧠 Approach
+
+### 1. Recognizing the Cipher Type  
+Given the format of the challenge and the repeating nature of the bytes, I quickly suspected this was a classic **XOR encryption** challenge using a **repeating key**. XOR ciphers are common in beginner CTF crypto tasks.
+
+### 2. Using the Known Plaintext  
+The challenge hinted that the flag starts with `ctflearn{`. This gave a **known plaintext** that can be XORed against the first few bytes of the cipher to **reveal the key**.
+
+### 3. Reconstructing the Key  
+By XORing each character of the known string with the corresponding cipher byte, I recovered part of the key. It turned out to be:
+
+```
+"jowlsjowl"
+```
+
+This revealed a repeating key of length 5: **`jowls`**
+
+### 4. Decrypting the Cipher  
+Using the recovered 5-character key, I repeated it until it matched the length of the cipher and XORed each cipher byte with the corresponding key byte to reveal the original plaintext — which turned out to be the flag.
+
+---
+
+## 🧪 Exploitation Process
+
+### 🔸 Final Script Used to Solve:
+
+```python
+cipher = b"\t\x1b\x11\x00\x16\x0b\x1d\x19\x17\x0b\x05\x1d(\x05\x005\x1b\x1f\t,\r\x00\x18\x1c\x0e"
+known_plaintext = "ctflearn{"
+
+recovered_key = []
+
+# Step 1: Recover the key from the known plaintext
+for i in range(len(known_plaintext)):
+    key = cipher[i] ^ ord(known_plaintext[i])
+    recovered_key.append(key)
+
+# Step 2: Print the recovered key as characters
+print("Recovered key (as chars):", "".join([chr(x) for x in recovered_key]))
+
+# We saw the output is "jowlsjowl", meaning the repeating key is "jowls" (length = 5)
+key_length = 5
+key_base = recovered_key[:key_length]
+
+# Step 3: Decrypt the flag using the repeating key
+flag = []
+for i in range(len(cipher)):
+    key_byte = key_base[i % key_length]  # repeat the key
+    decrypted_byte = cipher[i] ^ key_byte
+    flag.append(decrypted_byte)
+
+# Step 4: Print the decrypted flag
+print("Decrypted flag:", "".join([chr(x) for x in flag]))
+```
+
+---
+
+## 🏁 Flag
+
+```
+ctflearn{xor_......}
+Hack Harder to Get the Full Flag!....
+```
+
+---
+
+## 💬 Notes / What I Learned
+
+- **XOR with a repeating key (Crib Dragging Technique)** is a common technique in CTFs — easy to crack with known plaintext.
+- Knowing just part of the flag (like `ctflearn{`) can be powerful enough to break the cipher.
+- Escape characters in `bytes` are just decimal values and can be handled normally in Python.
+- Always test if the cipher repeats — repeating keys usually signal weak encryption.
+
+---
+
+## 🛠 Tools & Resources
+
+- Python (native `ord()` and `chr()` functions)
+- XOR logic understanding
+- Manual pattern recognition and decryption
+
+[+] By Osama Zeidan
