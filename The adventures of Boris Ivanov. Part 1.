@@ -1,0 +1,73 @@
+# 🚩 The Adventures of Boris Ivanov - Part 1 - Forensics - CTFlearn
+
+**Difficulty:** Medium  
+**Points:** 60  
+**Category:** Forensics  
+
+---
+
+## 🔍 Challenge Description
+
+> The KGB agent Boris Ivanov got information about an attempt to sell classified data. He quickly reacted and intercepted the correspondence. Help Boris understand what exactly they were trying to sell.  
+>
+> [Download the intercepted data](https://mega.nz/#!HfAHmKQb!zg6EPqfwes1bBDCjx7-ZFR_0O0-GtGg2Mrn56l5LCkE)
+
+---
+
+## 📂 Files Provided
+
+- One image file (from the MEGA link)
+
+---
+
+## 🧠 Approach
+
+### 1. Understanding the Challenge
+This challenge involves an image that seems visually normal but possibly contains hidden or steganographic information. Our goal is to reveal what data was being sold.
+
+### 2. Initial Observations
+Opening the image shows what looks like a low-contrast visual. Upon close inspection, you may sense that layers or hidden patterns exist—classic signs that visual steganography techniques might be involved.
+
+### 3. Tools Used
+
+- **GIMP** (GNU Image Manipulation Program)
+
+---
+
+## 🧪 Exploitation Process
+
+### Step-by-Step Breakdown Using GIMP
+
+1. **Open the image in GIMP.**
+2. **Duplicate the layer** (Right-click the layer → Duplicate Layer).
+3. Change the **blend mode** of the duplicated layer to `Difference`.
+4. Select the **Move Tool**.
+5. Gently **move the top layer horizontally** (left to right).
+
+This manipulation causes overlapping areas with similar content to cancel out and highlights differences—perfect for spotting hidden overlays or messages.
+
+As a result, hidden content emerges clearly.
+
+---
+
+## 🏁 Flag
+
+```
+flag{d0nt_.....}
+Hack Harder to get the flag....
+```
+
+---
+
+## 💬 Notes / What I Learned
+
+- Visual steganography can be solved with simple tools like GIMP without coding.
+- The `Difference` blend mode is powerful for exposing small changes between layers.
+- CTFs can sometimes require a *creative, visual* approach—not just technical ones.
+
+---
+
+## 🛠 Tools & Resources
+
+- [GIMP - Official Site](https://www.gimp.org/)
+- [GIMP Blend Modes](https://docs.gimp.org/en/gimp-concepts-layer-modes.html)
