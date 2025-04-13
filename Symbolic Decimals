@@ -1,0 +1,133 @@
+# 🚩 Symbolic Decimals – Crypto – CTFlearn  
+[+] By Osama Zeidan  
+
+**Difficulty:** Hard  
+**Points:** 80
+**Category:** Cryptography  
+
+---
+
+## 🔍 Challenge Description
+
+> Did you know that you can hide messages with symbols?  
+> For example, `!@#$%^&*(` is `123456789!`  
+>  
+> Now Try:  
+> `^&,*$,&),!@#,*#,!!^,(&,!!$,(%,$^,(%,*&,(&,!!$,!!%,(%,$^,(%,&),!!!,!!$,(%,$^,(%,&^,!)%,!)@,!)!,!@%`  
+>  
+> However, this isn't as easy as you might think.
+
+The challenge provides a string made up entirely of symbols. The hint suggests that symbols correspond to numbers as typed on the keyboard using the Shift key.
+
+---
+
+## 📂 Files Provided
+
+None — the data is embedded in the challenge description.
+
+---
+
+## 🧠 Approach
+
+### 1. Understanding the Mapping
+
+From keyboard layout knowledge:
+
+```
+! → 1
+@ → 2
+# → 3
+$ → 4
+% → 5
+^ → 6
+& → 7
+* → 8
+( → 9
+) → 0
+```
+
+These symbols are used to encode numbers. Each group of symbols (separated by commas) maps to a sequence of digits.
+
+### 2. Decrypting the Symbols
+
+I created a script to:
+- Loop through every character in the encrypted string
+- Replace each symbol with its corresponding digit
+- Insert a space where commas were to separate numbers
+- Output a full decimal string
+
+---
+
+## 🧪 Exploitation Process
+
+### 🔸 Python Script Used:
+
+```python
+s = "^&,*$,&),!@#,*#,!!^,(&,!!$,(%,$^,(%,*&,(&,!!$,!!%,(%,$^,(%,&),!!!,!!$,(%,$^,(%,&^,!)%,!)@,!)!,!@%"
+s1 = ""
+
+for ch in s:
+    if ch == '!':
+        s1 += '1'
+    elif ch == '@':
+        s1 += '2'
+    elif ch == '#':
+        s1 += '3'
+    elif ch == '$':
+        s1 += '4'
+    elif ch == '%':
+        s1 += '5'
+    elif ch == '^':
+        s1 += '6'
+    elif ch == '&':
+        s1 += '7'
+    elif ch == '*':
+        s1 += '8'
+    elif ch == '(':
+        s1 += '9'
+    elif ch == ')':
+        s1 += '0'
+    else:
+        s1 += " "
+
+print(s1)
+```
+
+This outputs a space-separated list of numbers like:
+```
+67 84 70 123 83 116 97 114 95 46 95 87 97 114 115 ........
+```
+
+---
+
+### 🔸 Final Step: Convert to Text
+
+I used [CyberChef](https://gchq.github.io/CyberChef) and applied:
+- **"From Decimal"** operation to convert each number into ASCII characters
+- This revealed the hidden flag
+
+---
+
+## 🏁 Flag
+
+```
+CTF{Star_._......}
+Hack Harder to Get the Full Flag!....
+```
+
+---
+
+## 💬 Notes / What I Learned
+
+- This challenge combined cryptography with a bit of keyboard trivia
+- Recognizing the Shift+Symbol relationship was the key to cracking it
+- Tools like CyberChef make decoding symbol-based or numeric encoding extremely efficient
+
+---
+
+## 🛠 Tools & Resources
+
+- Custom Python script to convert symbols to digits
+- [CyberChef] for decoding
+
+[+] By Osama Zeidan
