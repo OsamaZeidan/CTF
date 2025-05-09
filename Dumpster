@@ -1,0 +1,79 @@
+🚩 Dumpster - Forensics - CTFlearn
+[+] By Osama Zeidan
+Difficulty: Medium
+Points: 60
+Category: Forensics
+
+🔍 Challenge Description
+I found a flag, but it was encrypted! Our systems have detected that someone has successfully decrypted this flag, and we stealthily took a heap dump of the program (in Java). Can you recover the flag for me?
+You are provided with the source code of the Java program and the heap dump file:
+Decryptor.java, heapdump.hprof
+
+
+📂 Files Provided
+- Decryptor.java → Contains the AES encryption logic.
+- heapdump.hprof → Captured memory snapshot, potentially holding sensitive values.
+
+🧠 Approach
+1. Understanding the Challenge
+The heap dump (heapdump.hprof) represents a snapshot of a running Java program’s memory. Since the flag was encrypted using AES, we suspect that either the decryption key or flag might be retrievable from memory.
+
+🧪 Exploitation Process
+🔸 Step 1: Initial Inspection with strings and grep
+Before using VisualVM, I performed an initial scan to locate any readable plaintext strings in the heap dump:
+strings heapdump.hprof | grep -i FLAG  
+strings heapdump.hprof | grep -i password  
+
+
+This revealed some memory contents, but the flag wasn’t directly visible. However, I suspected that the hashed password used for AES decryption might be stored within Java objects.
+🔸 Step 2: Analyzing Heap Dump with VisualVM
+Since strings and grep provided hints but didn’t expose the full flag, I loaded the heap dump into VisualVM for a deeper analysis.
+VisualVM Steps:
+- Open VisualVM and load heapdump.hprof.
+- Navigate through classes and objects stored in memory.
+- Locate Decryptor$Password, which contains encryption and decryption logic.
+- Identify the passHash array, which holds the 16-byte AES key (truncated from SHA-256).
+- Extract these byte values, which were stored as {7, 95, -34, 16, -89, -86, 73, 108, -128, 71, 43, 41, 100, 40, 53, -24}.
+🔸 Step 3: Modifying Decryptor.java to Use the Extracted Key
+Instead of waiting for user input, I directly injected the extracted hashed password into a modified version of the program.
+Original Code (User-Based Password Entry)
+public Password(char[] pass) throws Exception {  
+    MessageDigest digest = MessageDigest.getInstance("SHA-256");  
+    this.passHash = Arrays.copyOf(digest.digest(new String(pass).getBytes("UTF-8")), 16);  
+}  
+
+
+[+] Modified Code (Using Extracted Hash from Memory)
+private byte[] passHash = {7, 95, -34, 16, -89, -86, 73, 108, -128, 71, 43, 41, 100, 40, 53, -24};  
+
+public Password() throws Exception {  
+    // Removed SHA-256 derivation from user input  
+}  
+
+
+[+] This ensured that the correct decryption key was used without requiring user input.
+🔸 Step 4: Executing the Modified Code to Extract the Flag
+Once the modification was complete, I compiled and executed the updated program:
+javac Test.java  
+java Test  
+
+
+The flag was successfully decrypted and printed! 🎉
+
+🏁 Flag
+stCTF{h34p_6u.....}  
+
+
+💬 Notes / What I Learned
+- Heap dumps can reveal sensitive data, including AES keys and encrypted content.
+- Tools like VisualVM help inspect running program memory and extract key information.
+- Hardcoded cryptographic keys are dangerous—if extracted from memory, attackers can decrypt sensitive data.
+- AES-ECB mode is insecure due to pattern leaks; AES-CBC or AES-GCM would be more secure.
+
+🛠 Tools & Resources
+- [strings] - Extract readable text from binaries
+- [grep] - Filter specific keywords from output
+- [VisualVM] - Analyze Java heap dumps
+- [Java Decryptor] - Reverse encrypted values
+
+[+] By Osama Zeidan
