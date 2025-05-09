@@ -1,0 +1,53 @@
+🚩 Simple Steganography - Steganography - CTFlearn
+[+] By Osama Zeidan
+Difficulty: Easy
+Points: 30
+Category: Forensics
+
+🔍 Challenge Description
+A suspicious image is provided. Can you uncover the hidden message?
+Steganography techniques might be useful here.
+
+
+📂 Files Provided
+- stego_image.jpg → The image suspected of containing hidden data.
+
+🧠 Approach
+1. Understanding the Challenge
+Given the name “Simple Steganography”, we expect the hidden data to be embedded using basic techniques, such as text stored within the image metadata or common steganographic tools.
+
+🧪 Exploitation Process
+🔸 Step 1: Inspecting the Image with strings
+Since steganography often involves hidden text, I ran the following command to check for embedded content:
+strings stego_image.jpg | less  
+
+
+Scrolling through the output, I found a potential password for extraction.
+🔸 Step 2: Using steghide to Extract Data
+Since the challenge hinted at steganography, I attempted to extract any hidden files inside the image using steghide:
+steghide extract -sf stego_image.jpeg
+
+
+Upon entering the password retrieved from strings, the extraction succeeded, revealing a hidden text file containing an encoded flag.
+🔸 Step 3: Decoding the Flag with CyberChef
+The extracted flag appeared to be Base64-encoded, requiring decoding:
+- Opened CyberChef.
+- Used the Base64 Decode operation.
+- Cleaned up extra characters to reveal the final flag.
+
+🏁 Flag
+CTFlearn{this_.....}  
+
+
+
+💬 Notes / What I Learned
+- strings is useful for discovering hidden passwords within files.
+- Steghide works well for extracting embedded messages when a password is provided.
+- CyberChef is great for Base64 decoding and data cleanup.
+
+🛠 Tools & Resources
+- [strings] - Scans for readable text within binary files
+- [steghide] - Extracts hidden data from images
+- [CyberChef] - Decodes Base64 and other data formats
+
+[+] By Osama Zeidan
