@@ -1,0 +1,123 @@
+🚩 **Naughty Cat** - Forensics - CTF
+[+] By Osama Zeidan
+**Difficulty:** Medium
+**Points:** 50
+**Category:** Forensics
+
+---
+
+🔍 **Challenge Description**
+I think my cat is hiding something...
+
+You're given a file: `cut3_c4t.png`. It looks like an ordinary image, but something feels off.
+
+---
+
+📂 **Files Provided**
+
+* `cut3_c4t.png` → PNG image, potentially hiding embedded or obfuscated data.
+
+---
+
+🧠 **Approach**
+
+1. **Understanding the Challenge**
+   The minimal description and odd file name hinted at something being hidden inside the image — possibly steganography or archive embedding.
+
+---
+
+🧪 **Exploitation Process**
+
+🔸 **Step 1: Analyzing the PNG with Binwalk**
+I started with:
+
+```bash
+binwalk cut3_c4t.png
+```
+
+Binwalk revealed embedded files including:
+
+* `29.zlib`
+* `28E4B.rar`
+
+Extracted them using:
+
+```bash
+binwalk --extract cut3_c4t.png
+```
+
+🔸 **Step 2: Extracting Zlib and RAR Files**
+
+* Used `7z` to extract the `.zlib` compressed file.
+* Used `unrar` to extract `28E4B.rar`.
+
+Result:
+
+* One MP3 file
+* An empty file `29`
+* A RAR file named `y0u_4r3_cl0s3.rar`
+
+🔸 **Step 3: Investigating the RAR File**
+The file `y0u_4r3_cl0s3.rar` wasn't recognized:
+
+```bash
+file y0u_4r3_cl0s3.rar
+# Output: data
+```
+
+This hinted at a malformed header. Using `xxd` and `hexedit`, I inspected and found an incorrect 8-byte header.
+
+Corrected it to match the standard RAR signature:
+
+```
+52 61 72 21 1A 07 00 00
+```
+
+🔸 **Step 4: RAR Password Hunt**
+Upon fixing the header, extraction failed due to password protection.
+
+Used:
+
+```bash
+strings *.mp3 | grep -i pass
+```
+
+...but no results. Suspecting audio steganography, I opened the MP3 in **Audacity** and switched to **spectrogram view**.
+
+There, the password was clearly embedded visually in the audio spectrum.
+
+🔸 **Step 5: Final Extraction and Decoding**
+Used the spectrogram-revealed password to extract `y0u_4r3_cl0s3.rar`.
+
+Inside:
+A `.txt` file containing a **Base64-encoded** string.
+
+Decoded it using **CyberChef** with "From Base64", and uncovered the flag.
+
+---
+
+🏁 **Flag**
+`f0r3n51cs_.....`
+[+] Hack Harder to Get the Flag...
+
+---
+
+💬 **Notes / What I Learned**
+
+* **Multilayered file concealment** is common in CTF forensics challenges.
+* Tools like **binwalk**, **xxd**, and **hexedit** are crucial for digging into malformed headers.
+* **Spectrogram-based steganography** is a powerful and creative hiding technique.
+* Always check **audio files** in CTFs — they often contain visual or auditory clues.
+* CyberChef is a must-have for quick encoding/decoding operations.
+
+---
+
+🛠 **Tools & Resources**
+
+* \[`binwalk`] - Detect and extract embedded files
+* \[`7z`] - Decompress Zlib archives
+* \[`unrar`] - Handle RAR archive extraction
+* \[`xxd`] / \[`hexedit`] - Analyze and fix binary headers
+* \[`Audacity`] - Inspect audio using spectrogram
+* \[`CyberChef`] - Decode Base64 and more
+* \[`strings`] / \[`grep`] - Analyze raw content
